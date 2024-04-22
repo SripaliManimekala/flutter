@@ -3,31 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:basics_app/start_screen.dart';
 import 'package:flutter/widgets.dart';
 
-
 class Quiz extends StatefulWidget {
-
   const Quiz({super.key});
 
-@override
+  @override
   State<StatefulWidget> createState() {
     return _QuizState();
   }
 }
 
-class  _QuizState extends State<Quiz> {
+class _QuizState extends State<Quiz> {
   //managing the state
-  Widget? activeScreen ;//? indicates active state can also be null or widget
+  // Widget? activeScreen ;//? indicates active state can also be null or widget
+
+  var activeScreen = 'start-screen'; //identifier
 
   //initialization work when the state object of this class is created
-  @override
-  void initState() {//called just after the object was created
-    super.initState();
-    activeScreen = StartScreen(switchScreen);
-  }
-  
+  // @override
+  // void initState() {//called just after the object was created
+  //   super.initState();
+  //   activeScreen = StartScreen(switchScreen);
+
+  // }
+
   void switchScreen() {
     setState(() {
-      activeScreen = const QuestionsScreen();
+      // activeScreen = const QuestionsScreen();
+      activeScreen = 'questions-screen';
     });
   }
 
@@ -46,7 +48,9 @@ class  _QuizState extends State<Quiz> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: activeScreen),
+            child: activeScreen == 'start-screen'
+                ? StartScreen(switchScreen)
+                : const QuestionsScreen()),
       ),
     );
   }
