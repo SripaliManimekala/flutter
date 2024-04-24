@@ -19,9 +19,8 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   var currentQuestionIndex = 0;
   
   void answerQuestion(String selectedAnswer) {
-    // currentQuestionIndex += 1;
-    //get property from widget class to state class
     
+    //get property from widget class to state class - widget.onSelectAnswer
     widget.onSelectAnswer(selectedAnswer);
     setState(() {
       currentQuestionIndex++;
