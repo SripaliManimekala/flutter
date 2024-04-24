@@ -16,6 +16,7 @@ class _QuizState extends State<Quiz> {
   //managing the state
   // Widget? activeScreen ;//? indicates active state can also be null or widget
 
+  final List<String> selectedAnswers = [];
   var activeScreen = 'start-screen'; //identifier
 
   //initialization work when the state object of this class is created
@@ -32,14 +33,18 @@ class _QuizState extends State<Quiz> {
       activeScreen = 'questions-screen';
     });
   }
-
+  
+  void chooeseAnswer(String answer) {//call this and pass answer whenever we click on a answer
+    selectedAnswers.add(answer);
+  }
+ 
   @override
   Widget build(BuildContext context) {
 
     Widget screenWidget = StartScreen(switchScreen);
 
-    if (activeScreen == 'questions-screen') {
-      screenWidget = const QuestionsScreen();
+    if (activeScreen == 'questions-screen') {//forward chooseanswer function to question screen widget
+      screenWidget =  QuestionsScreen(onSelectAnswer: chooeseAnswer,);
     }
     
 
