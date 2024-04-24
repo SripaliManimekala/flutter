@@ -2,6 +2,7 @@ import 'package:basics_app/questions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:basics_app/start_screen.dart';
 import 'package:basics_app/data/questions.dart';
+import 'package:basics_app/result_screen.dart';
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key});
@@ -14,7 +15,7 @@ class Quiz extends StatefulWidget {
 
 class _QuizState extends State<Quiz> {
 
-  final List<String> selectedAnswers = [];
+  List<String> selectedAnswers = [];
   var activeScreen = 'start-screen'; //identifier
 
 
@@ -30,8 +31,13 @@ class _QuizState extends State<Quiz> {
 
     if(selectedAnswers.length == questions.length){
       //if ran oout of questions
-      activeScreen =  'result-screen';
+      //call set state to trigger the build method again
+      setState(() {
+        selectedAnswers = [];
+        activeScreen = 'result-screen';
+      });
     }
+
   }
  
   @override
@@ -41,6 +47,9 @@ class _QuizState extends State<Quiz> {
 
     if (activeScreen == 'questions-screen') {//forward chooseanswer function to question screen widget
       screenWidget =  QuestionsScreen(onSelectAnswer: chooeseAnswer,);
+    } 
+    if(activeScreen == 'result-screen') {
+      screenWidget = ResultScreen(chosenAnswers: selectedAnswers,);
     }
     
 
