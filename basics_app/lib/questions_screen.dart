@@ -43,7 +43,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Text(
               currentQuestion.text,
               style: GoogleFonts.lato(
-                color: const Color.fromARGB(255, 179, 127, 237),
+                color: Color.fromARGB(255, 127, 198, 237),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),

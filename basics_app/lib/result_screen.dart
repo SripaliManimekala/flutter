@@ -1,21 +1,42 @@
-import 'package:basics_app/answer_button.dart';
 import 'package:flutter/material.dart';
 import 'package:basics_app/data/questions.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:basics_app/questions_summary.dart';
 
 class ResultScreen extends StatelessWidget {
 
-  const ResultScreen({super.key, required this.chosenAnswers});
+  const ResultScreen(this.restartQuiz, {super.key, required this.chosenAnswers});
+
+  final void Function() restartQuiz;
 
   final List<String> chosenAnswers;
 
   //questions + chosenAnswers
-  List<Map> getSummaryData() {
+  List<Map<String, Object>> getSummaryData() {
+    final List<Map<String, Object>> summary = [];
 
+    for(var i=0; i<chosenAnswers.length; i++) {
+      summary.add({
+        'question_index': i,
+        'question': questions[i].text,
+        'user_choice': chosenAnswers[i],
+        'correct_answer': questions[i].answers[0],//assumption: 1st answer is the correct one
+      });
+    }
+
+    return summary;
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final summaryData =  getSummaryData();
+    final numTotalQuestions = questions.length;
+    final numCorrectQuestions = summaryData.where((element) 
+      => element['user_choice']== element['correct_answer']
+    ).length;
+
+
     return SizedBox(
       width: double.infinity,
       child: Container(
@@ -25,46 +46,18 @@ class ResultScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'you answerd 5 out of 10 questions correctly!',
+              'You answerd $numCorrectQuestions out of $numTotalQuestions questions correctly!',
               style: GoogleFonts.lato(
-                color: const Color.fromARGB(255, 179, 127, 237),
+                color: Color.fromARGB(255, 251, 255, 255),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            Text(
-              'question1',
-              style: GoogleFonts.lato(
-                color: const Color.fromARGB(255, 179, 127, 237),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Provided Answer',
-              style: GoogleFonts.lato(
-                color: const Color.fromARGB(255, 93, 5, 200),
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Correct Answer',
-              style: GoogleFonts.lato(
-                color: const Color.fromARGB(255, 45, 78, 212),
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            OutlinedButton(
-              onPressed: () {},
+            QuestionsSummary(summaryData),
+            OutlinedButton.icon(
+              onPressed: restartQuiz,
               style: OutlinedButton.styleFrom(
                 // backgroundColor:const Color.fromARGB(255, 64, 5, 109),
                 foregroundColor: Colors.white,
@@ -72,7 +65,8 @@ class ResultScreen extends StatelessWidget {
                   fontSize: 15,
                 ),
               ),
-              child: const Text('Restart Quiz'),
+              label: const Text('Restart Quiz'),
+              icon: const Icon(Icons.refresh_rounded),
             ),
           ],
         ),

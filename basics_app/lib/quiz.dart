@@ -33,13 +33,19 @@ class _QuizState extends State<Quiz> {
       //if ran oout of questions
       //call set state to trigger the build method again
       setState(() {
-        selectedAnswers = [];
         activeScreen = 'result-screen';
       });
     }
 
   }
- 
+  
+  void restartQuiz() {
+    setState(() {
+      selectedAnswers = [];
+      activeScreen = 'questions-screen';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -49,7 +55,7 @@ class _QuizState extends State<Quiz> {
       screenWidget =  QuestionsScreen(onSelectAnswer: chooeseAnswer,);
     } 
     if(activeScreen == 'result-screen') {
-      screenWidget = ResultScreen(chosenAnswers: selectedAnswers,);
+      screenWidget = ResultScreen(restartQuiz, chosenAnswers: selectedAnswers,);
     }
     
 
@@ -59,8 +65,8 @@ class _QuizState extends State<Quiz> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: <Color>[
-                  Color.fromARGB(255, 64, 5, 109),
-                  Color.fromARGB(255, 87, 15, 143)
+                  Color.fromARGB(255, 67, 131, 215),
+                  Color.fromARGB(255, 42, 108, 201)
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
