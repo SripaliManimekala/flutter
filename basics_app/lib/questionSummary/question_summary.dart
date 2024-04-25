@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:basics_app/questionSummary/question_identifier.dart';
 
 class QuestionSummary extends StatelessWidget {
   const QuestionSummary(this.qData, {super.key});
 
   final Map<String, Object> qData;
 
+  bool isCorrect() {
+    if(qData['user_choice'] == qData['correct_answer']){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: qData['user_choice'] == qData['correct_answer']
-                ? const Color.fromARGB(255, 239, 230, 108)
-                : const Color.fromARGB(255, 240, 113, 104),
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            ((qData['question_index'] as int) + 1).toString(),
-            style: const TextStyle(
-              color: Colors.black,
-            ),
-          ),
-        ),
+        QuestionIdentifier(isCorrect(), (qData['question_index']as int)),
         const SizedBox(width: 20),
         Expanded(
           child: Column(
