@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:basics_app/data/questions.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:basics_app/questions_summary.dart';
+import 'package:basics_app/questionSummary/questions_summary.dart';
 
 class ResultScreen extends StatelessWidget {
 
@@ -48,7 +48,7 @@ class ResultScreen extends StatelessWidget {
             Text(
               'You answerd $numCorrectQuestions out of $numTotalQuestions questions correctly!',
               style: GoogleFonts.lato(
-                color: Color.fromARGB(255, 251, 255, 255),
+                color:const Color.fromARGB(255, 251, 255, 255),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -59,7 +59,6 @@ class ResultScreen extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: restartQuiz,
               style: OutlinedButton.styleFrom(
-                // backgroundColor:const Color.fromARGB(255, 64, 5, 109),
                 foregroundColor: Colors.white,
                 textStyle: const TextStyle(
                   fontSize: 15,
