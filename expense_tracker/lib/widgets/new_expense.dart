@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class NewExpense extends StatefulWidget {
-
   const NewExpense({super.key});
 
   @override
@@ -19,21 +18,27 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           TextField(
             onChanged: _saveTitleInput,
             maxLength: 50,
-            decoration: const InputDecoration(
-              label: Text('Title')
-            ),
+            decoration: const InputDecoration(label: Text('Title')),
+          ),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  print(_enteredTitle);
+                },
+                child: const Text('Save Expense'),
+              )
+            ],
           ),
         ],
       ),
-      );
-
-      
+    );
   }
 }
