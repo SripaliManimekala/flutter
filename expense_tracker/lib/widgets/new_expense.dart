@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class NewExpense extends StatefulWidget {
   const NewExpense({super.key});
 
@@ -10,15 +11,18 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-
   final _titleController = TextEditingController();
-  final  _amountController = TextEditingController();
+  final _amountController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
+  }
+
+  void _presentDatePicker() {
+    showDatePicker(context: context, firstDate: DateTime(2023), lastDate: DateTime.now());
   }
 
   @override
@@ -32,15 +36,45 @@ class _NewExpenseState extends State<NewExpense> {
             maxLength: 50,
             decoration: const InputDecoration(label: Text('Title')),
           ),
-          TextField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                maxLength: 10,
-                decoration: const InputDecoration(label: Text('Amount')),
-          ),
-
           Row(
             children: [
+              Expanded(
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                      label: Text('Amount'), 
+                      prefixText: '\$ '
+                  ),
+                ),
+              ),
+              const  SizedBox(width: 20),
+              //date input
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('Selected Date'),
+                    IconButton(
+                      onPressed: _presentDatePicker,
+                      icon: const Icon(Icons.calendar_month),),
+                  ],
+                ),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Row(
+            children: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel')),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () {
                   print(_titleController.text);
@@ -48,8 +82,6 @@ class _NewExpenseState extends State<NewExpense> {
                 },
                 child: const Text('Save Expense'),
               ),
-              const Spacer(),
-              TextButton(onPressed: () {}, child: const Text('Cancel'))
             ],
           ),
         ],
