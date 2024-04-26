@@ -58,7 +58,7 @@ class _NewExpenseState extends State<NewExpense> {
               ));
       return;
     }
-
+    //add new expense
     widget.onAddExpense(
       Expense(
           title: _titleController.text,
@@ -72,7 +72,7 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20,48,20,20),
       child: Column(
         children: [
           TextField(
