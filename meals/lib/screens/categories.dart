@@ -14,6 +14,7 @@ class CategoriesScreen extends StatelessWidget {
       ),
       //output all categories => which can be selected and move inside to:
       body: GridView(
+        padding: const EdgeInsets.all(24),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, 
           childAspectRatio:1.5,
