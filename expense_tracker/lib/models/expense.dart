@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +20,7 @@ const categoryIcons = {
 
 class Expense {
 
+  //constructor
   Expense({
     required this.title,
     required this.amount,
@@ -33,4 +35,24 @@ class Expense {
   final Category category;
 
   String get formattedDate => formatter.format(date);
+}
+
+//add new data model for charts
+class ExpenseBucket {//we need one bucket for every category
+
+  ExpenseBucket({
+    required this.category,
+    required this.expenses,
+  });
+
+  final Category category;
+  final List<Expense> expenses;
+
+  double get totalExpenses {
+    double sum = 0;
+    for(final expense  in expenses) {
+      sum += expense.amount;
+    }
+    return sum;
+  } 
 }
