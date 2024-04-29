@@ -3,10 +3,9 @@ import 'package:expense_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:expense_tracker/models/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
-
+import 'package:flutter/widgets.dart';
 
 class Expenses extends StatefulWidget {
-
   const Expenses({super.key});
 
   @override
@@ -15,21 +14,40 @@ class Expenses extends StatefulWidget {
   }
 }
 
-class  _ExpensesState extends State<Expenses> {
-
+class _ExpensesState extends State<Expenses> {
   final List<Expense> _registeredExpenses = [
-    Expense(title: 'Flutter Course', amount: 19.99, date: DateTime.now(), category: Category.work ),
-    Expense(title: 'Trip', amount: 150.00, date: DateTime.now(), category: Category.travel ),
-    Expense(title: 'Dinner', amount: 30.00, date: DateTime.now(), category: Category.food ),
-    Expense(title: 'Cinnema', amount: 30.00, date: DateTime.now(), category: Category.leasure ),
-    Expense(title: 'lunch', amount: 30.00, date: DateTime.now(), category: Category.food ),
+    Expense(
+        title: 'Flutter Course',
+        amount: 19.99,
+        date: DateTime.now(),
+        category: Category.work),
+    Expense(
+        title: 'Trip',
+        amount: 150.00,
+        date: DateTime.now(),
+        category: Category.travel),
+    Expense(
+        title: 'Dinner',
+        amount: 30.00,
+        date: DateTime.now(),
+        category: Category.food),
+    Expense(
+        title: 'Cinnema',
+        amount: 30.00,
+        date: DateTime.now(),
+        category: Category.leasure),
+    Expense(
+        title: 'lunch',
+        amount: 30.00,
+        date: DateTime.now(),
+        category: Category.food),
   ];
 
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
-      isScrollControlled: true,
-      context: context, 
-      builder: (ctx) => NewExpense(onAddExpense: _addExpense));
+        isScrollControlled: true,
+        context: context,
+        builder: (ctx) => NewExpense(onAddExpense: _addExpense));
   }
 
   void _addExpense(Expense expense) {
@@ -43,30 +61,33 @@ class  _ExpensesState extends State<Expenses> {
     setState(() {
       _registeredExpenses.remove(expense);
     });
-    ScaffoldMessenger.of(context).clearSnackBars();//clear any previous snackbars when swipe
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 3),
-        content: const Text('Expense deleted.'),
-        action: SnackBarAction(
-          label: 'Undo', 
+    ScaffoldMessenger.of(context)
+        .clearSnackBars(); //clear any previous snackbars when swipe
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 3),
+      content: const Text('Expense deleted.'),
+      action: SnackBarAction(
+          label: 'Undo',
           onPressed: () {
             setState(() {
               _registeredExpenses.insert(expenseIndex, expense);
             });
           }),
-        ));
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent = const  Center(child: Text('No expenses found. Start adding some!'));
+    final width = MediaQuery.of(context).size.width;
 
-    if(_registeredExpenses.isNotEmpty) {
+    Widget mainContent =
+        const Center(child: Text('No expenses found. Start adding some!'));
+
+    if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpensesList(
-              expenses: _registeredExpenses, 
-              onRemoveExpense: _removeExpense,
-            );
+        expenses: _registeredExpenses,
+        onRemoveExpense: _removeExpense,
+      );
     }
 
     return Scaffold(
@@ -74,25 +95,34 @@ class  _ExpensesState extends State<Expenses> {
         title: const Text(
           'Flutter ExpenseTracker',
           style: TextStyle(
-            // color: Color.fromARGB(255, 0, 0, 0),
-          ),
-          ),
-        actions:[
+              // color: Color.fromARGB(255, 0, 0, 0),
+              ),
+        ),
+        actions: [
           IconButton(
             onPressed: _openAddExpenseOverlay,
-            icon:const Icon(Icons.add),
+            icon: const Icon(Icons.add),
           ),
         ],
-        // backgroundColor: Color.fromARGB(255, 183, 144, 240), 
+        // backgroundColor: Color.fromARGB(255, 183, 144, 240),
       ),
-      body: Column(
-        children: [
-          Chart(expenses: _registeredExpenses),
-          Expanded(
-            child: mainContent,
-          ),
-        ],
-      ),
+      body: width < 600
+          ? Column(
+              children: [
+                Chart(expenses: _registeredExpenses),
+                Expanded(
+                  child: mainContent,
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(child: Chart(expenses: _registeredExpenses)),
+                Expanded(
+                  child: mainContent,
+                ),
+              ],
+            ),
     );
   }
 }
