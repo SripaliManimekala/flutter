@@ -38,19 +38,42 @@ class  _ExpensesState extends State<Expenses> {
   }
 
   void _removeExpense(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
     setState(() {
       _registeredExpenses.remove(expense);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();//clear any previous snackbars when swipe
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: const Text('Expense deleted.'),
+        action: SnackBarAction(
+          label: 'Undo', 
+          onPressed: () {
+            setState(() {
+              _registeredExpenses.insert(expenseIndex, expense);
+            });
+          }),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = const  Center(child: Text('No expenses found. Start adding some!'));
+
+    if(_registeredExpenses.isNotEmpty) {
+      mainContent = ExpensesList(
+              expenses: _registeredExpenses, 
+              onRemoveExpense: _removeExpense,
+            );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Flutter ExpenseTracker',
           style: TextStyle(
-            color: Colors.white,
+            // color: Color.fromARGB(255, 0, 0, 0),
           ),
           ),
         actions:[
@@ -59,13 +82,14 @@ class  _ExpensesState extends State<Expenses> {
             icon:const Icon(Icons.add),
           ),
         ],
-        backgroundColor: Colors.blue,
-        
+        // backgroundColor: Color.fromARGB(255, 183, 144, 240), 
       ),
       body: Column(
         children: [
           const Text('Chart'),
-          Expanded(child: ExpensesList(expenses: _registeredExpenses, onRemoveExpense: _removeExpense,)),
+          Expanded(
+            child: mainContent,
+          ),
         ],
       ),
     );
