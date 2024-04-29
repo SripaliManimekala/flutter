@@ -96,7 +96,7 @@ class Chart extends StatelessWidget {
                 .map(
                   (bucket) => Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         '\$${bucket.totalExpenses.toStringAsFixed(2)}',
                         style: TextStyle(
