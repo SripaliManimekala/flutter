@@ -50,13 +50,11 @@ class _TabsScreenState extends State<TabsScreen> {
   }
 
   void _setScreen(String identifier) {
+     Navigator.of(context).pop();//cloase the drawer and its tabs screen
     if(identifier=='filters') {
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (ctx) => const FiltersScreen()));
-    } else {//meals->tabs screen itself
-      Navigator.of(context).pop();//cloase the drawer and its tabs screen
-    }
-
+    } 
   }
 
 @override
