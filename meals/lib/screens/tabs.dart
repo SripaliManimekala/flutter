@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:meals/screens/categories.dart';
 import 'package:meals/screens/filters.dart';
 import 'package:meals/screens/meals.dart';
-// import 'package:meals/models/meal.dart';
 import 'package:meals/widgets/main_drawer.dart';
 import 'package:meals/providers/meals_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals/providers/favourites_provider.dart';
+import 'package:meals/providers/filters_provider.dart';
  
 const kInitialFilters = {
   Filter.glutenFree: false,
@@ -27,12 +27,6 @@ class TabsScreen extends ConsumerStatefulWidget {
 
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
-  // final List<Meal> _favouriteMeals = [];
-  Map<Filter, bool> _selectedFilters =
-      kInitialFilters; //variable to store selected filters
-
-
-
 
   void _selectPage(int index) {
     setState(() {
@@ -43,36 +37,31 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   void _setScreen(String identifier) async {
     Navigator.of(context).pop(); //cloase the drawer and its tabs screen
     if (identifier == 'filters') {
-      final result = await Navigator.of(context).push<Map<Filter, bool>>(
+      Navigator.of(context).push<Map<Filter, bool>>(
         MaterialPageRoute(
             //get the filters as a future..after user interaction with the filter screen and click back button
-            builder: (ctx) => FiltersScreen(currentFilters: _selectedFilters,)),//pass current filters again to Filter screen
+            builder: (ctx) => const FiltersScreen()),//pass current filters again to Filter screen
       );
-      setState(() {
-        _selectedFilters = result ?? kInitialFilters; //if result null,_selectedFilters will fallback to kInitialFilters
-      });
+
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final meals = ref.watch(mealsProvider);
+    final activeFilters = ref.watch(filtersProvider);
     final availbleMeals = meals.where((meal) {
     // final availbleMeals = dummyMeals.where((meal) {
-      if (_selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
-        //if filter is set and meal doesnt satisfy the filter
+      if (activeFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
         return false;
       }
-      if (_selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
-        //if filter is set and meal doesnt satisfy the filter
+      if (activeFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
         return false;
       }
-      if (_selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
-        //if filter is set and meal doesnt satisfy the filter
+      if (activeFilters[Filter.vegetarian]! && !meal.isVegetarian) {
         return false;
       }
-      if (_selectedFilters[Filter.vegan]! && !meal.isVegan) {
-        //if filter is set and meal doesnt satisfy the filter
+      if (activeFilters[Filter.vegan]! && !meal.isVegan) {
         return false;
       }
       return true; //if all filters are not set or meal satisfies them it returns true
