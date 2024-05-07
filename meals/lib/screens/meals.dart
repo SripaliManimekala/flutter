@@ -3,18 +3,16 @@ import 'package:meals/models/meal.dart';
 import 'package:meals/widgets/meals_list.dart';
 
 class MealsScreen extends StatelessWidget {
-  const MealsScreen({super.key, this.title, required this.meals, required this.onToggleFavourite});
+  const MealsScreen({super.key, this.title, required this.meals});
 
   final String? title;
   final List<Meal> meals;
-  final void Function(Meal meal) onToggleFavourite;
 
   @override
   Widget build(BuildContext context) {
     //call meals list widget
     Widget content = MealsList(
       meals: meals,
-      onToggleFavourite: onToggleFavourite,
   );
 
     if (meals.isEmpty) {
