@@ -64,11 +64,10 @@ class _TabsScreenState extends State<TabsScreen> {
       final result = await Navigator.of(context).push<Map<Filter, bool>>(
         MaterialPageRoute(
             //get the filters as a future..after user interaction with the filter screen and click back button
-            builder: (ctx) => const FiltersScreen()),
+            builder: (ctx) => FiltersScreen(currentFilters: _selectedFilters,)),//pass current filters again to Filter screen
       );
       setState(() {
-        _selectedFilters = result ??
-            kInitialFilters; //if result null,_selectedFilters will fallback to kInitialFilters
+        _selectedFilters = result ?? kInitialFilters; //if result null,_selectedFilters will fallback to kInitialFilters
       });
     }
   }
@@ -98,7 +97,7 @@ class _TabsScreenState extends State<TabsScreen> {
     ///we should pass filters to the category screen
     Widget activePage = CategoriesScreen(
       onToggleFavourite: _toggleMealFavouriteStatus,
-      availableMeals: availbleMeals,
+      availableMeals: availbleMeals,//passe filtered meals
     );
     var activePageTitle = 'Categories';
 
