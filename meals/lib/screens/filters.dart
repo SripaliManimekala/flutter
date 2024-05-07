@@ -20,6 +20,7 @@ class _FiltersScreenState extends ConsumerState<FiltersScreen> {
   @override
   void initState() {
     super.initState();
+    //reding filters provider data here in init to initialize our local state
     final activeFilters = ref.read(filtersProvider);
     _glutenFreeFilterSet = activeFilters[Filter.glutenFree]!;
     _lactoseFreeFilterSet = activeFilters[Filter.lactoseFree]!;
