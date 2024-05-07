@@ -44,6 +44,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
         onPopInvoked: (bool didPop) {
           if (didPop) return;
           Navigator.of(context).pop({//a map data type
+          //add enum identifiers fo good
             Filter.glutenFree: _glutenFreeFilterSet,
             Filter.lactoseFree: _lactoseFreeFilterSet,
             Filter.vegetarian: _vegetarianFilterSet,
