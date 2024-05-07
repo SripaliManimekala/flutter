@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:meals/screens/categories.dart';
 import 'package:meals/screens/filters.dart';
 import 'package:meals/screens/meals.dart';
-import 'package:meals/models/meal.dart';
+// import 'package:meals/models/meal.dart';
 import 'package:meals/widgets/main_drawer.dart';
 import 'package:meals/providers/meals_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,29 +31,8 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   Map<Filter, bool> _selectedFilters =
       kInitialFilters; //variable to store selected filters
 
-  void _showInfoMessage(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      duration: const Duration(seconds: 3),
-      content: Text(message),
-    ));
-  }
 
-  // void _toggleMealFavouriteStatus(Meal meal) {
-  //   final isExisting = _favouriteMeals.contains(meal);
 
-  //   if (isExisting) {
-  //     setState(() {
-  //       _favouriteMeals.remove(meal);
-  //       _showInfoMessage('Meal is no longer a favourite!');
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _favouriteMeals.add(meal);
-  //       _showInfoMessage('Marked as a favourite!');
-  //     });
-  //   }
-  // }
 
   void _selectPage(int index) {
     setState(() {
