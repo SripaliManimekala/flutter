@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({super.key});
+  
 
   @override
   State<NewItemScreen> createState() {
@@ -32,15 +34,19 @@ class _NewItemScreenState extends State<NewItemScreen> {
             'quantity': _enteredQuantity,
             'category': _selectedcategory.title,
           }));
+      
+      final Map<String, dynamic> resData = json.decode(response.body);
 
-      print(response.body);
-      print(response.statusCode);
       //if we leave the wiget while await the context refer 
       //to a widget not on the view, so chack for it
       if(!context.mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(GroceryItem(
+        id: resData['name'], //id in response body
+        name: _enteredName, 
+        quantity: _enteredQuantity, 
+        category: _selectedcategory));
     }
   }
 

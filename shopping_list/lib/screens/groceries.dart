@@ -15,6 +15,7 @@ class GroceriesScreen extends StatefulWidget {
 
 class _GroceriesScreenState extends State<GroceriesScreen> {
   List<GroceryItem> _groceryItems = [];
+  var _isLoading = true;
 
   //call load items in init
   @override
@@ -29,8 +30,7 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
         'flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
     final response = await http.get(url);
     //convert JSON data back to dart objects
-    final Map<String, dynamic> listData =
-        json.decode(response.body);
+    final Map<String, dynamic> listData = json.decode(response.body);
     //convert back to list og DroceryItems
     final List<GroceryItem> lodedItems = [];
     for (final item in listData.entries) {
@@ -47,13 +47,21 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
     }
     setState(() {
       _groceryItems = lodedItems;
+      _isLoading = false;
     });
   }
 
   void _addItem() async {
-    await Navigator.of(context).push<GroceryItem>(
+    //get new item without fetching it from backend
+    final newItem = await Navigator.of(context).push<GroceryItem>(
         MaterialPageRoute(builder: (ctx) => const NewItemScreen()));
-    _loadItems();
+
+    if (newItem == null) {
+      return;
+    }
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   void _removeItem(GroceryItem item) {
@@ -85,7 +93,9 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
       },
     );
 
-    if (_groceryItems.isEmpty) {
+    if (_isLoading) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (_groceryItems.isEmpty) {
       content = Center(
           child: Column(
         mainAxisSize: MainAxisSize.min,
