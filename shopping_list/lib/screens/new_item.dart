@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
 import 'package:shopping_list/models/grocery_item.dart';
+import 'package:http/http.dart' as http;
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({super.key});
@@ -21,7 +22,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
        _formKey.currentState!.save();
-      //pass data to another screen
+       
+      //pass data to another screen, data stored in memory
       Navigator.of(context).pop(GroceryItem(
         id: DateTime.now().toString(), 
         name: _enteredName, 
