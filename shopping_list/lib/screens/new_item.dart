@@ -35,6 +35,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
 
       print(response.body);
       print(response.statusCode);
+      //if we leave the wiget while await the context refer 
+      //to a widget not on the view, so chack for it
       if(!context.mounted) {
         return;
       }

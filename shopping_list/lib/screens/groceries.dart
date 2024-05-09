@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/grocery_item.dart';
 import 'package:shopping_list/screens/new_item.dart';
 import 'package:shopping_list/widgets/grocery_list.dart';
+import 'package:http/http.dart' as http;
 
 class GroceriesScreen extends StatefulWidget {
   const GroceriesScreen({super.key});
@@ -11,19 +14,46 @@ class GroceriesScreen extends StatefulWidget {
 }
 
 class _GroceriesScreenState extends State<GroceriesScreen> {
+  List<GroceryItem> _groceryItems = [];
 
-  final List<GroceryItem> _groceryItems = [];
+  //call load items in init
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
 
-  void _addItem() async{
-    final newItem = await Navigator.of(context).push<GroceryItem>(
-      MaterialPageRoute(builder: (ctx) => const NewItemScreen()));
-    
-    if(newItem == null) {
-      return;
+  //load items in app load up
+  void _loadItems() async {
+    final url = Uri.https(
+        'flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
+    final response = await http.get(url);
+    //convert JSON data back to dart objects
+    final Map<String, dynamic> listData =
+        json.decode(response.body);
+    //convert back to list og DroceryItems
+    final List<GroceryItem> lodedItems = [];
+    for (final item in listData.entries) {
+      //first tem that matches the condition
+      final category = categories.entries
+          .firstWhere(
+              (catItem) => catItem.value.title == item.value['category'])
+          .value;
+      lodedItems.add(GroceryItem(
+          id: item.key,
+          name: item.value['name'],
+          quantity: item.value['quantity'],
+          category: category));
     }
     setState(() {
-      _groceryItems.add(newItem);
+      _groceryItems = lodedItems;
     });
+  }
+
+  void _addItem() async {
+    await Navigator.of(context).push<GroceryItem>(
+        MaterialPageRoute(builder: (ctx) => const NewItemScreen()));
+    _loadItems();
   }
 
   void _removeItem(GroceryItem item) {
@@ -31,7 +61,7 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
     setState(() {
       _groceryItems.remove(item);
     });
-        ScaffoldMessenger.of(context)
+    ScaffoldMessenger.of(context)
         .clearSnackBars(); //clear any previous snackbars when swipe
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       duration: const Duration(seconds: 3),
@@ -46,19 +76,18 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
     ));
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     Widget content = GroceryList(
-      groceryItems: _groceryItems, 
+      groceryItems: _groceryItems,
       onRemoveItem: (item) {
         _removeItem(item);
-      } ,);
+      },
+    );
 
-    if(_groceryItems.isEmpty) {
+    if (_groceryItems.isEmpty) {
       content = Center(
-        child: Column(
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -79,21 +108,19 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
                 .copyWith(color: Theme.of(context).colorScheme.onBackground),
           ),
         ],
-      )
-      );
+      ));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Groceries'),
-        actions: [
-          IconButton(
-            onPressed: _addItem,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: content
-    );
+        appBar: AppBar(
+          title: const Text('Groceries'),
+          actions: [
+            IconButton(
+              onPressed: _addItem,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        body: content);
   }
 }
