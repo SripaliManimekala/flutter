@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
-import 'package:shopping_list/models/grocery_item.dart';
 import 'package:http/http.dart' as http;
 
 class NewItemScreen extends StatefulWidget {
@@ -19,19 +19,27 @@ class _NewItemScreenState extends State<NewItemScreen> {
   var _enteredQuantity = 1;
   var _selectedcategory = categories[Categories.vegetables]!;
 
-  void _saveItem() {
+  void _saveItem() async{
     if (_formKey.currentState!.validate()) {
-       _formKey.currentState!.save();
-       
-      //pass data to another screen, data stored in memory
-      Navigator.of(context).pop(GroceryItem(
-        id: DateTime.now().toString(), 
-        name: _enteredName, 
-        quantity: _enteredQuantity, 
-        category: _selectedcategory));
+      _formKey.currentState!.save();
+      final url = Uri.https('flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
+      final response = await http.post(url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({
+            'name': _enteredName,
+            'quantity': _enteredQuantity,
+            'category': _selectedcategory.title,
+          }));
 
+      print(response.body);
+      print(response.statusCode);
+      if(!context.mounted) {
+        return;
+      }
+      Navigator.of(context).pop();
     }
-   
   }
 
   @override
@@ -92,33 +100,33 @@ class _NewItemScreenState extends State<NewItemScreen> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
-                      value: _selectedcategory,
-                      items: [
-                      for (final category in categories.entries)
-                        DropdownMenuItem(
-                          value: category.value,
-                          child: Row(
-                            children: [
-                              ColoredBox(
-                                color: category.value.color,
-                                child: const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                ),
+                        value: _selectedcategory,
+                        items: [
+                          for (final category in categories.entries)
+                            DropdownMenuItem(
+                              value: category.value,
+                              child: Row(
+                                children: [
+                                  ColoredBox(
+                                    color: category.value.color,
+                                    child: const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 6,
+                                  ),
+                                  Text(category.value.title)
+                                ],
                               ),
-                              const SizedBox(
-                                width: 6,
-                              ),
-                              Text(category.value.title)
-                            ],
-                          ),
-                        )
-                    ], 
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedcategory = value!;
-                      });
-                    }),
+                            )
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedcategory = value!;
+                          });
+                        }),
                   )
                 ],
               ),
