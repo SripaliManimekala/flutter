@@ -33,8 +33,15 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
 
     if (response.statusCode >= 400) {
       setState(() {
-        _error = 'Failed to tech data. Please try again later.';
+        _error = 'Failed to fetch data. Please try again later.';
       });
+    }
+
+    if (response.body == 'null') {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
     }
 
     //convert JSON data back to dart objects
@@ -80,7 +87,7 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
       _groceryItems.remove(item);
     });
 
-    final url = Uri.https('flutterd-prep-22dd0-default-rtdb.firebaseio.com',
+    final url = Uri.https('flutter-prep-22dd0-default-rtdb.firebaseio.com',
         'shopping-list/${item.id}.json');
 
     //delete from database
