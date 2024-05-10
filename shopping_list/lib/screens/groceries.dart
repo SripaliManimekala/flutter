@@ -16,6 +16,7 @@ class GroceriesScreen extends StatefulWidget {
 class _GroceriesScreenState extends State<GroceriesScreen> {
   List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
+  String? _error;
 
   //call load items in init
   @override
@@ -29,6 +30,13 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
     final url = Uri.https(
         'flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
     final response = await http.get(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = 'Failed to tech data. Please try again later.';
+      });
+    }
+
     //convert JSON data back to dart objects
     final Map<String, dynamic> listData = json.decode(response.body);
     //convert back to list og DroceryItems
@@ -64,24 +72,36 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
     final groceryIndex = _groceryItems.indexOf(item);
+
+    //delete from local list without fetching again
     setState(() {
       _groceryItems.remove(item);
     });
-    ScaffoldMessenger.of(context)
-        .clearSnackBars(); //clear any previous snackbars when swipe
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      duration: const Duration(seconds: 3),
-      content: const Text('Item deleted.'),
-      action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              _groceryItems.insert(groceryIndex, item);
-            });
-          }),
-    ));
+
+    final url = Uri.https('flutterd-prep-22dd0-default-rtdb.firebaseio.com',
+        'shopping-list/${item.id}.json');
+
+    //delete from database
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+          .clearSnackBars(); //clear any previous snackbars when swipe
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text('Failed to delete item.'),
+      ));
+      //save again locally
+      setState(() {
+        _groceryItems.insert(groceryIndex, item);
+      });
+    }
   }
 
   @override
@@ -119,6 +139,12 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
           ),
         ],
       ));
+    }
+
+    if (_error != null && _isLoading == true) {
+      content = Center(
+        child: Text(_error!),
+      );
     }
 
     return Scaffold(

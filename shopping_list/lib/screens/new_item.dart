@@ -7,7 +7,6 @@ import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({super.key});
-  
 
   @override
   State<NewItemScreen> createState() {
@@ -20,11 +19,16 @@ class _NewItemScreenState extends State<NewItemScreen> {
   var _enteredName = '';
   var _enteredQuantity = 1;
   var _selectedcategory = categories[Categories.vegetables]!;
+  var _isSending = false;
 
-  void _saveItem() async{
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final url = Uri.https('flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
+      setState(() {
+        _isSending = true;
+      });
+      final url = Uri.https('flutter-prep-22dd0-default-rtdb.firebaseio.com',
+          'shopping-list.json');
       final response = await http.post(url,
           headers: {
             'Content-Type': 'application/json',
@@ -34,19 +38,19 @@ class _NewItemScreenState extends State<NewItemScreen> {
             'quantity': _enteredQuantity,
             'category': _selectedcategory.title,
           }));
-      
+
       final Map<String, dynamic> resData = json.decode(response.body);
 
-      //if we leave the wiget while await the context refer 
-      //to a widget not on the view, so chack for it
-      if(!context.mounted) {
+      //if we leave the wiget while await the context refer
+      //to a widget not on the view, so check for it
+      if (!context.mounted) {
         return;
       }
       Navigator.of(context).pop(GroceryItem(
-        id: resData['name'], //id in response body
-        name: _enteredName, 
-        quantity: _enteredQuantity, 
-        category: _selectedcategory));
+          id: resData['name'], //id in response body
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedcategory));
     }
   }
 
@@ -145,15 +149,24 @@ class _NewItemScreenState extends State<NewItemScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                      onPressed: () {
-                        _formKey.currentState!.reset();
-                      },
+                      onPressed: _isSending
+                          ? null
+                          : () {
+                              _formKey.currentState!.reset();
+                            },
                       child: const Text('Reset')),
                   const SizedBox(
                     width: 10,
                   ),
                   ElevatedButton(
-                      onPressed: _saveItem, child: const Text('Add Item'))
+                      onPressed: _isSending ? null : _saveItem,
+                      child: _isSending
+                          ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text('Add Item'))
                 ],
               ),
             ],
