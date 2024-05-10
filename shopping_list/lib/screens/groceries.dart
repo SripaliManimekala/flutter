@@ -29,41 +29,49 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
   void _loadItems() async {
     final url = Uri.https(
         'flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
-    final response = await http.get(url);
 
-    if (response.statusCode >= 400) {
-      setState(() {
-        _error = 'Failed to fetch data. Please try again later.';
-      });
-    }
+    try {
+      final response = await http.get(url);
 
-    if (response.body == 'null') {
+      if (response.statusCode >= 400) {
+        setState(() {
+          _error = 'Failed to fetch data. Please try again later.';
+        });
+      }
+
+      if (response.body == 'null') {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      //convert JSON data back to dart objects
+      final Map<String, dynamic> listData = json.decode(response.body);
+      //convert back to list og DroceryItems
+      final List<GroceryItem> lodedItems = [];
+      for (final item in listData.entries) {
+        //first tem that matches the condition
+        final category = categories.entries
+            .firstWhere(
+                (catItem) => catItem.value.title == item.value['category'])
+            .value;
+        lodedItems.add(GroceryItem(
+            id: item.key,
+            name: item.value['name'],
+            quantity: item.value['quantity'],
+            category: category));
+      }
       setState(() {
+        _groceryItems = lodedItems;
         _isLoading = false;
       });
-      return;
-    }
 
-    //convert JSON data back to dart objects
-    final Map<String, dynamic> listData = json.decode(response.body);
-    //convert back to list og DroceryItems
-    final List<GroceryItem> lodedItems = [];
-    for (final item in listData.entries) {
-      //first tem that matches the condition
-      final category = categories.entries
-          .firstWhere(
-              (catItem) => catItem.value.title == item.value['category'])
-          .value;
-      lodedItems.add(GroceryItem(
-          id: item.key,
-          name: item.value['name'],
-          quantity: item.value['quantity'],
-          category: category));
+    } catch (err) {
+      setState(() {
+        _error = 'Something went wrong! Please try again later';
+      });
     }
-    setState(() {
-      _groceryItems = lodedItems;
-      _isLoading = false;
-    });
   }
 
   void _addItem() async {

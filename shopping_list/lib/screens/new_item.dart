@@ -20,6 +20,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
   var _enteredQuantity = 1;
   var _selectedcategory = categories[Categories.vegetables]!;
   var _isSending = false;
+  String? _error;
+  bool error = false;
 
   void _saveItem() async {
     if (_formKey.currentState!.validate()) {
@@ -29,28 +31,37 @@ class _NewItemScreenState extends State<NewItemScreen> {
       });
       final url = Uri.https('flutter-prep-22dd0-default-rtdb.firebaseio.com',
           'shopping-list.json');
-      final response = await http.post(url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: json.encode({
-            'name': _enteredName,
-            'quantity': _enteredQuantity,
-            'category': _selectedcategory.title,
-          }));
 
-      final Map<String, dynamic> resData = json.decode(response.body);
+      try {
+        final response = await http.post(url,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              'name': _enteredName,
+              'quantity': _enteredQuantity,
+              'category': _selectedcategory.title,
+            }));
 
-      //if we leave the wiget while await the context refer
-      //to a widget not on the view, so check for it
-      if (!context.mounted) {
-        return;
+        final Map<String, dynamic> resData = json.decode(response.body);
+
+        //if we leave the wiget while await the context refer
+        //to a widget not on the view, so check for it
+        if (!context.mounted) {
+          return;
+        }
+        Navigator.of(context).pop(GroceryItem(
+            id: resData['name'], //id in response body
+            name: _enteredName,
+            quantity: _enteredQuantity,
+            category: _selectedcategory));
+      } catch (err) {
+        _isSending = false;
+        error = true;
+        setState(() {
+          _error = 'Something went wrong!';
+        });
       }
-      Navigator.of(context).pop(GroceryItem(
-          id: resData['name'], //id in response body
-          name: _enteredName,
-          quantity: _enteredQuantity,
-          category: _selectedcategory));
     }
   }
 
@@ -148,6 +159,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  error ? Text(_error!) : Container(),
+                  const SizedBox(width: 10,),
                   TextButton(
                       onPressed: _isSending
                           ? null
@@ -166,7 +179,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                               width: 16,
                               child: CircularProgressIndicator(),
                             )
-                          : const Text('Add Item'))
+                          : const Text('Add Item')),
                 ],
               ),
             ],
