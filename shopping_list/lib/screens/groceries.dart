@@ -15,63 +15,60 @@ class GroceriesScreen extends StatefulWidget {
 
 class _GroceriesScreenState extends State<GroceriesScreen> {
   List<GroceryItem> _groceryItems = [];
-  var _isLoading = true;
+  // var _isLoading = true;
+  late Future<List<GroceryItem>>
+      _loadedItems; //late - tell swe have no initial value but will have a value in future
   String? _error;
 
   //call load items in init
   @override
   void initState() {
     super.initState();
-    _loadItems();
+    _loadedItems = _loadItems();
   }
 
   //load items in app load up
-  void _loadItems() async {
+  Future<List<GroceryItem>> _loadItems() async {
     final url = Uri.https(
         'flutter-prep-22dd0-default-rtdb.firebaseio.com', 'shopping-list.json');
 
-    try {
-      final response = await http.get(url);
+    final response = await http.get(url);
 
-      if (response.statusCode >= 400) {
-        setState(() {
-          _error = 'Failed to fetch data. Please try again later.';
-        });
-      }
-
-      if (response.body == 'null') {
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      //convert JSON data back to dart objects
-      final Map<String, dynamic> listData = json.decode(response.body);
-      //convert back to list og DroceryItems
-      final List<GroceryItem> lodedItems = [];
-      for (final item in listData.entries) {
-        //first tem that matches the condition
-        final category = categories.entries
-            .firstWhere(
-                (catItem) => catItem.value.title == item.value['category'])
-            .value;
-        lodedItems.add(GroceryItem(
-            id: item.key,
-            name: item.value['name'],
-            quantity: item.value['quantity'],
-            category: category));
-      }
-      setState(() {
-        _groceryItems = lodedItems;
-        _isLoading = false;
-      });
-
-    } catch (err) {
-      setState(() {
-        _error = 'Something went wrong! Please try again later';
-      });
+    if (response.statusCode >= 400) {
+      // setState(() {
+      //   _error = 'Failed to fetch data. Please try again later.';
+      // });
+      throw Exception('Failed to fetch data. Please try again later.');
     }
+
+    if (response.body == 'null') {
+      // setState(() {
+      //   _isLoading = false;
+      // });
+      return []; //return empty list since load items is a list
+    }
+
+    //convert JSON data back to dart objects
+    final Map<String, dynamic> listData = json.decode(response.body);
+    //convert back to list og DroceryItems
+    final List<GroceryItem> loadedItems = [];
+    for (final item in listData.entries) {
+      //first tem that matches the condition
+      final category = categories.entries
+          .firstWhere(
+              (catItem) => catItem.value.title == item.value['category'])
+          .value;
+      loadedItems.add(GroceryItem(
+          id: item.key,
+          name: item.value['name'],
+          quantity: item.value['quantity'],
+          category: category));
+    }
+    // setState(() {
+    //   _groceryItems = lodedItems;
+    //   _isLoading = false;
+    // });
+    return loadedItems;
   }
 
   void _addItem() async {
@@ -121,47 +118,6 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = GroceryList(
-      groceryItems: _groceryItems,
-      onRemoveItem: (item) {
-        _removeItem(item);
-      },
-    );
-
-    if (_isLoading) {
-      content = const Center(child: CircularProgressIndicator());
-    } else if (_groceryItems.isEmpty) {
-      content = Center(
-          child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'nothing here!',
-            style: Theme.of(context)
-                .textTheme
-                .headlineLarge!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            'Try adding category!',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
-          ),
-        ],
-      ));
-    }
-
-    if (_error != null && _isLoading == true) {
-      content = Center(
-        child: Text(_error!),
-      );
-    }
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('Groceries'),
@@ -172,6 +128,49 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
             ),
           ],
         ),
-        body: content);
+        body: FutureBuilder(
+          future: _loadedItems,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              //isLoading
+              content = const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(snapshot.error.toString()),
+              );
+            }
+
+            if (snapshot.data!.isEmpty) {
+              return Center(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'nothing here!',
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    'Try adding category!',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground),
+                  ),
+                ],
+              ));
+            }
+  
+            GroceryList(
+              groceryItems: _groceryItems,
+              onRemoveItem: (item) {
+                _removeItem(item);
+              },
+            );
+          },
+        ));
   }
 }
