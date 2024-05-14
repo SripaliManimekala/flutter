@@ -14,7 +14,7 @@ module.exports = {
     emp_name: {type:'string', required: true},
     emp_email: { type: 'string', required: true, unique: true },
     emp_mobile: { type: 'string', allowNull: true },
-    emp_salary: { type: 'number', required: true },
+    emp_salary: { type: 'number', columnType: 'decimal', required: true },
     department_id: {model: 'Department'},
     created_date: { type: 'ref', columnType: 'datetime', autoCreatedAt: true}
   },
