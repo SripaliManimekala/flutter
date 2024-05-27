@@ -1,9 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/employee.dart';
+import 'package:frontend/screens/new_employee.dart';
 import 'package:frontend/services/employee_service.dart';
 import 'package:frontend/widgets/employee_table.dart';
-import 'package:http/http.dart' as http;
-// import 'dart:convert';
+
 
 class EmployeeScreen extends StatefulWidget {
   const EmployeeScreen({super.key});
@@ -26,27 +27,28 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     super.initState();
     _loadEmployees();
   }
-/////////////////////////////////
-Future<void> _loadEmployees() async {
-  
+/////////////////////////////////////////////////////////////////
+Future<void> _loadEmployees() async { 
     try {
       final loadedEmp = await _employeeService.getAllEmployees();
-
-      // if (listData == null) {
-      //   setState(() {
-      //     _isLoading = false;
-      //   });
-      //   return;
-      // }
-
+      if (loadedEmp == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
       setState(() {
         _employees = loadedEmp;
         _isLoading = false;
       });
-    } catch (e) {
-      print(e);
+    } catch (error) {
       setState(() {
-        _error = e.toString();
+        if(error is SocketException) {
+          _isLoading = false;
+          _error = 'Connection timed out.Please check your internet connection.';
+        } else {
+          _error = error.toString().split(": ")[1];
+        }
       });
     }
 }
@@ -54,15 +56,30 @@ Future<void> _loadEmployees() async {
 void _removeEmployee(Employee employee) async{
   // final emp_index = _employees.indexOf(employee);
 
+  try {
   setState(() {
     _employees.remove(employee);
   });
-
-  print(employee.id);
-  final url = Uri.parse('http://192.168.1.129:1337/api/v1/delete-employee?id=${employee.id}');
-
-  final response = await http.post(url);
-  print(response.statusCode);
+  await _employeeService.deleteEmployee(employee.id);
+  } catch(error) {
+    setState(() {
+      _error = error.toString().split(": ")[1];
+    });
+  }
+ 
+}
+//////////////////////////////////////////////////////////////////
+void _addEmployeeLocally() async {
+  final newEmp = await Navigator.of(context).push<Employee>(
+    MaterialPageRoute(builder: (ctx) => const NewEmployeeScreen())
+  );
+  print(newEmp);
+  if(newEmp == null) {
+    return;
+  }
+  setState(() {
+    _employees.add(newEmp);
+  });
 }
 //////////////////////////////////////////////////////////////////
 
@@ -110,10 +127,10 @@ void _removeEmployee(Employee employee) async{
     return Scaffold(
       appBar: AppBar(
         title: const Text('Employee Details'),
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        // backgroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
           IconButton(
-            onPressed: () {}, //ADD EMP,
+            onPressed: _addEmployeeLocally, //ADD EMP,
             icon: const Icon(Icons.add),
           ),
         ],

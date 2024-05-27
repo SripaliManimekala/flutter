@@ -7,7 +7,7 @@ const employees = [
     empName: 'testname', 
     empEmail: 'test@test.com', 
     empSalary: 1000, 
-    // departmentId: 2
+    departmentId: 2
     ),
     Employee(
     id: 2,
@@ -15,6 +15,6 @@ const employees = [
     empName: 'exname', 
     empEmail: 'ex@ex.com', 
     empSalary: 2000, 
-    // departmentId: 2
+    departmentId: 2
     ),
 ];

@@ -7,7 +7,7 @@ class Employee {
   final String empEmail;
   final String? empMobile;
   final int empSalary;
-  // final int departmentId;
+  final int departmentId;
 
   const Employee({
     required this.id,
@@ -16,7 +16,7 @@ class Employee {
     required this.empEmail,
     this.empMobile,
     required this.empSalary,
-    // required this.departmentId,
+    required this.departmentId,
   });
 
 }

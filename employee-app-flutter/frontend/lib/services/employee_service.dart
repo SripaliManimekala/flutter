@@ -5,7 +5,7 @@ import 'dart:convert';
 
 class EmployeeService {
 
-  Future<List<Employee>> getAllEmployees() async {
+  Future<List<Employee>?> getAllEmployees() async {
     final url = Uri.parse('http://192.168.1.129:1337/api/v1/get-all-employee');
 
 
@@ -15,7 +15,7 @@ class EmployeeService {
       if (response.statusCode == 200) {
         final Map<String,dynamic> employeesData =  json.decode(response.body);
         final List<dynamic> listData = employeesData['employees'];
-         final List<Employee> loadedEmp = [];
+        final List<Employee> loadedEmp = [];
         for (final empData in listData) {
           Map<String,dynamic> emp = empData as  Map<String,dynamic>;
           loadedEmp.add(Employee(
@@ -24,16 +24,50 @@ class EmployeeService {
               empName: emp['emp_name'],
               empEmail: emp['emp_email'],
               empSalary: emp['emp_salary'] as int,
-              // departmentId: emp.value['department_id']['id']
+              departmentId: emp['department_id']
               ));
         }
-        // if(listData.isEmpty) {
-        //   return null;
-        // }
+        if(loadedEmp.isEmpty) {
+          return null;
+        }
         return loadedEmp;
 
-      } else {
+      } else if(response.statusCode >= 400){
         throw Exception('Failed to fetch data. Please try again later');
+      } else {
+        throw Exception('Something went wrong! Please try again later.');
       }
+  }
+
+  Future<void> deleteEmployee(int id) async {
+    
+    final url = Uri.parse('http://192.168.1.129:1337/api/v1/delete-employee?id=${id}');
+    final response = await http.post(url);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete employee');
+    }
+  } 
+
+  Future<Map<String, dynamic>> addEmployee(String code, String name, String email,int salary, String mobile,int departmentId ) async {
+    final url = Uri.parse('http://192.168.1.129:1337/api/v1/add-employee');
+
+    final response = await http.post(url,
+        headers: {'Content-Type':'application/json'},
+        body: json.encode({
+          'emp_code': code,
+          'emp_name': name,
+          'emp_email': email,
+          'emp_salary': salary,
+          'emp_mobile': mobile,
+          'department_id': departmentId
+        }));
+
+    if(response.statusCode == 200) {
+      return json.decode(response.body);//convert json response to a map
+    } else if (response.statusCode >= 400) {
+      throw Exception('Failed to add employee');
+    } else {
+        throw Exception('Something went wrong! Please try again later.');
+    }    
   }
 }

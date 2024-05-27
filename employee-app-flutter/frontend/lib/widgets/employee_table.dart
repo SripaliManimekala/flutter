@@ -14,9 +14,9 @@ class EmployeeTable extends StatelessWidget {
       child: Table(
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         columnWidths: const  {
-          0: FixedColumnWidth(100), // Adjust the width of the first column
+          0: FixedColumnWidth(70), // Adjust the width of the first column
           1: FlexColumnWidth(), // Let the second column take remaining space
-          2: FixedColumnWidth(100), // Adjust the width of the third column
+          2: FixedColumnWidth(80), // Adjust the width of the third column
           3: FixedColumnWidth(100), // Adjust the width of the fourth column
         },
         border: TableBorder.all(borderRadius: BorderRadius.circular(5),
@@ -28,9 +28,10 @@ class EmployeeTable extends StatelessWidget {
               child: Center(
               child: Text(
                 'Code',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                // !.copyWith(
+                //       color: Theme.of(context).colorScheme.onPrimary,
+                //     ),
               ),
             )),
             TableCell(
@@ -38,27 +39,30 @@ class EmployeeTable extends StatelessWidget {
               child: Text(
                 'Employee Name',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                // !.copyWith(
+                //       color: Theme.of(context).colorScheme.onPrimary,
+                //     ),
               ),
             )),
             TableCell(
                 child: Center(
               child: Text(
                 'Salary',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                // !.copyWith(
+                //       color: Theme.of(context).colorScheme.onPrimary,
+                //     ),
               ),
             )),
             TableCell(
                 child: Center(
               child: Text(
                 'Action',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                // !.copyWith(
+                //       color: Theme.of(context).colorScheme.surface,
+                //     ),
               ),
             )),
           ]),
