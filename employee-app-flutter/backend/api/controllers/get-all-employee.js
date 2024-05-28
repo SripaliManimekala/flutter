@@ -15,7 +15,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     try{
-      const all_employees = await Employee.find().sort('emp_salary ASC');
+      const all_employees = await Employee.find();
 
       return exits.success({
         status: true,

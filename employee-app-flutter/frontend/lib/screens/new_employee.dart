@@ -22,12 +22,6 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   var _enteredMobile;
   var _enteredSalary = 0;
   var _selectedDep;
-  // late String _enteredName ;
-  // late String _enteredCode ;
-  // late String _enteredEmail;
-  // late String _enteredMobile;
-  // late int _enteredSalary ;
-  // late int _selectedDep ;
   var _isSending = false;
   String? _error;
   bool error = false;

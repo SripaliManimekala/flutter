@@ -83,19 +83,11 @@ void _addEmployeeLocally() async {
 }
 //////////////////////////////////////////////////////////////////
 void _editEmployee(Employee employee) async {
-  print("passed emp ${employee.id}");
-  print("passed emp ${employee.empMobile}");
-  print("passed emp ${employee.empCode}");
-  print("passed emp ${employee.empName}");
   final updatedEmp = await Navigator.of(context).push<Employee>(MaterialPageRoute(
     builder: (context) => NewEmployeeScreen(employee: employee,)));
   if(updatedEmp == null) {
     return;
   }
-  print(updatedEmp.id);
-  print(updatedEmp.empMobile);
-  print(updatedEmp.empName);
-  print(updatedEmp.empCode);
   setState(() {
     int index = _employees.indexWhere((emp) => emp.id == updatedEmp.id);
     _employees[index] = updatedEmp;
