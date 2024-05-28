@@ -23,6 +23,7 @@ class EmployeeService {
               empCode: emp['emp_code'],
               empName: emp['emp_name'],
               empEmail: emp['emp_email'],
+              empMobile: emp['emp_mobile'],
               empSalary: emp['emp_salary'] as int,
               departmentId: emp['department_id']
               ));

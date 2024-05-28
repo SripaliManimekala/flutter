@@ -16,22 +16,22 @@ class NewEmployeeScreen extends StatefulWidget {
 
 class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   final _formKey = GlobalKey<FormState>();
-  // var _enteredName = '';
-  // var _enteredCode = '';
-  // var _enteredEmail = '';
-  // var _enteredMobile = '';
-  // var _enteredSalary = 0;
-  // var _isSending = false;
-  late String _enteredName ;
-  late String _enteredCode ;
-  late String _enteredEmail;
-  late String _enteredMobile;
-  late int _enteredSalary ;
-  late int _selectedDep ;
+  var _enteredName = '';
+  var _enteredCode = '';
+  var _enteredEmail = '';
+  var _enteredMobile;
+  var _enteredSalary = 0;
+  var _selectedDep;
+  // late String _enteredName ;
+  // late String _enteredCode ;
+  // late String _enteredEmail;
+  // late String _enteredMobile;
+  // late int _enteredSalary ;
+  // late int _selectedDep ;
   var _isSending = false;
   String? _error;
   bool error = false;
-  bool _isEditing = false;
+  bool editMode = false;
   List<Map<String, dynamic>> departments = [
     {
       'id': 1,
@@ -54,7 +54,23 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   final EmployeeService _employeeService = EmployeeService();//emp service instance
 
   void _showDialog() {
-    showDialog(
+    if(editMode) {
+      showDialog(
+      context: context, 
+      builder: (ctx)=> AlertDialog(
+        title: const Text('Success!'),
+        content: const Text('Employee Updated.'),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.of(ctx).pop();//close dialog
+            }, 
+            child: const Text('OK')
+          )
+        ],
+      ));
+    } else {
+      showDialog(
       context: context, 
       builder: (ctx)=> AlertDialog(
         title: const Text('Success!'),
@@ -68,6 +84,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
           )
         ],
       ));
+    }
   }
 
   void _saveEmployee() async {
@@ -75,31 +92,61 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
       _formKey.currentState!.save();
       setState(() {
         _isSending = true;
+        //editMode=false;//////////
         error = false;
         _error = null;
       });
       try {
-        final Map<String, dynamic> resData = await _employeeService.addEmployee(
+        if(!editMode) {
+          final Map<String, dynamic> resData = await _employeeService.addEmployee(
           _enteredCode, 
           _enteredName, 
           _enteredEmail, 
           _enteredSalary, 
           _enteredMobile, 
           _selectedDep);
-        if (!context.mounted) {
+
+          if (!context.mounted) {
           return;
-        }
-        Navigator.of(context).pop(Employee(
-          id: resData['new_employee']['id'], 
-          empCode: _enteredCode, 
-          empName: _enteredName, 
-          empEmail: _enteredEmail, 
-          empSalary: _enteredSalary,
-          departmentId: _selectedDep ));
+          }
+          Navigator.of(context).pop(Employee(
+            id: resData['new_employee']['id'], 
+            empCode: _enteredCode, 
+            empName: _enteredName, 
+            empEmail: _enteredEmail, 
+            empSalary: _enteredSalary,
+            departmentId: _selectedDep ));
+          _showDialog();
         
-        _showDialog();
+        } else {//in editmode
+          await _employeeService.updateEmployee(
+            widget.employee!.id,
+            _enteredCode, 
+            _enteredName, 
+            _enteredEmail, 
+            _enteredSalary, 
+            _enteredMobile, 
+            _selectedDep);
+
+          if (!context.mounted) {
+            return;
+          }
+
+          Navigator.of(context).pop(Employee(
+            id: widget.employee!.id, 
+            empCode: _enteredCode, 
+            empName: _enteredName, 
+            empEmail: _enteredEmail, 
+            empSalary: _enteredSalary,
+            departmentId: _selectedDep ));
+          _showDialog();
+        }
+
+        
+        // _showDialog();
         setState(() {
           _isSending = false;
+          editMode = false;
         });
         
       } catch(err) {
@@ -114,6 +161,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
     }
   }
 
+
   @override
   void dispose() {
     super.dispose();
@@ -122,13 +170,13 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   @override
   void initState() {
     super.initState();
-    // _selectedDep = departments[0]['id'];
+    _selectedDep = departments[0]['id'];
     if(widget.employee != null) {
-      _isEditing = true;
+      editMode = true;
       _enteredCode = widget.employee!.empCode;
       _enteredName = widget.employee!.empName;
       _enteredEmail = widget.employee!.empEmail;
-      _enteredMobile = widget.employee!.empMobile ?? '';
+      _enteredMobile = widget.employee!.empMobile;
       _enteredSalary = widget.employee!.empSalary;
       _selectedDep = widget.employee!.departmentId;
     }
@@ -141,7 +189,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Employee' : 'Add a new Employee'),
+        title: Text(editMode ? 'Edit Employee' : 'Add a new Employee'),
         // backgroundColor: Theme.of(context).colorScheme.surface,
       ),
 
@@ -227,16 +275,16 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                         maxLength: 10,
                         decoration: const InputDecoration(label: Text('Mobile')),
                         initialValue: _enteredMobile,
-                        validator: (value) {
-                          //can return error if validation fails
-                          if (value == null ||
-                              value.isEmpty ||
-                              value.trim().length <= 1 ||
-                              value.trim().length > 50) {
-                            return 'Must be between 1 and 10 characters.';
-                          }
-                          return null;
-                        },
+                        // validator: (value) {
+                        //   //can return error if validation fails
+                        //   if (value == null ||
+                        //       value.isEmpty ||
+                        //       value.trim().length <= 1 ||
+                        //       value.trim().length > 10) {
+                        //     return 'Must be between 1 and 10 characters.';
+                        //   }
+                        //   return null;
+                        // },
                         onSaved: (value) {
                           _enteredMobile = value!;
                         },
@@ -297,7 +345,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                           if (error) Flexible(child: Text(_error!)),
                           const SizedBox(width: 10,),
                           TextButton(
-                              onPressed: _isSending
+                              onPressed: _isSending || editMode
                               ? null
                               :() {
                                 _formKey.currentState!.reset();
@@ -314,7 +362,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                                 width: 16,
                                 child: CircularProgressIndicator()
                               )
-                              : const Text('Add'))
+                              : Text(editMode ? 'Update':'Add'))
                         ],
                       ),
                     ],

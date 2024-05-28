@@ -80,6 +80,7 @@ class EmployeeTable extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             onEdit(emp);
+                            print(emp.empMobile);
                           }, 
                           icon: const Icon(Icons.edit),
                           color:const Color.fromARGB(255, 53, 144, 208),
