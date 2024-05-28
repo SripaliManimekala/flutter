@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/employee.dart';
 
 class EmployeeTable extends StatelessWidget {
-  const EmployeeTable({super.key, required this.employees, required this.onRemove});
+  const EmployeeTable({super.key, required this.employees, required this.onRemove, required this.onEdit});
 
   final void Function(Employee employee) onRemove;
+  final void Function(Employee employee) onEdit;
   final List<Employee> employees;
 
   @override
@@ -29,9 +30,6 @@ class EmployeeTable extends StatelessWidget {
               child: Text(
                 'Code',
                 style: Theme.of(context).textTheme.titleSmall
-                // !.copyWith(
-                //       color: Theme.of(context).colorScheme.onPrimary,
-                //     ),
               ),
             )),
             TableCell(
@@ -40,9 +38,6 @@ class EmployeeTable extends StatelessWidget {
                 'Employee Name',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleSmall
-                // !.copyWith(
-                //       color: Theme.of(context).colorScheme.onPrimary,
-                //     ),
               ),
             )),
             TableCell(
@@ -50,9 +45,6 @@ class EmployeeTable extends StatelessWidget {
               child: Text(
                 'Salary',
                 style: Theme.of(context).textTheme.titleSmall
-                // !.copyWith(
-                //       color: Theme.of(context).colorScheme.onPrimary,
-                //     ),
               ),
             )),
             TableCell(
@@ -60,9 +52,6 @@ class EmployeeTable extends StatelessWidget {
               child: Text(
                 'Action',
                 style: Theme.of(context).textTheme.titleSmall
-                // !.copyWith(
-                //       color: Theme.of(context).colorScheme.surface,
-                //     ),
               ),
             )),
           ]),
@@ -89,9 +78,11 @@ class EmployeeTable extends StatelessWidget {
                     child: Row(
                       children: [
                         IconButton(
-                          onPressed: () {}, 
-                          icon:  Icon(Icons.edit),
-                          color: Color.fromARGB(255, 53, 144, 208),
+                          onPressed: () {
+                            onEdit(emp);
+                          }, 
+                          icon: const Icon(Icons.edit),
+                          color:const Color.fromARGB(255, 53, 144, 208),
                           ),
                         const SizedBox(width: 2,),
                         IconButton(
@@ -99,7 +90,7 @@ class EmployeeTable extends StatelessWidget {
                             onRemove(emp);
                           }, 
                           icon: const Icon(Icons.delete),
-                          color: Color.fromARGB(255, 197, 30, 18),),
+                          color: const Color.fromARGB(255, 197, 30, 18),),
                       ],
                     ),
                   ),

@@ -10,7 +10,7 @@ class EmployeeService {
 
 
       final response = await http.get(url);
-      print(response.body);
+      // print(response.body);
 
       if (response.statusCode == 200) {
         final Map<String,dynamic> employeesData =  json.decode(response.body);
@@ -41,7 +41,7 @@ class EmployeeService {
 
   Future<void> deleteEmployee(int id) async {
     
-    final url = Uri.parse('http://192.168.1.129:1337/api/v1/delete-employee?id=${id}');
+    final url = Uri.parse('http://192.168.1.129:1337/api/v1/delete-employee?id=$id');
     final response = await http.post(url);
     if (response.statusCode != 200) {
       throw Exception('Failed to delete employee');
@@ -65,9 +65,34 @@ class EmployeeService {
     if(response.statusCode == 200) {
       return json.decode(response.body);//convert json response to a map
     } else if (response.statusCode >= 400) {
+      print(response);
       throw Exception('Failed to add employee');
     } else {
         throw Exception('Something went wrong! Please try again later.');
     }    
+  }
+
+  Future<Map<String,dynamic>> updateEmployee(int id, String code, String name, String email,int salary, String mobile,int departmentId) async {
+    
+    final url = Uri.parse('http://192.168.1.129:1337/api/v1/edit-employee?id=$id');
+    final response = await http.post(url,
+    headers: {'Content-Type':'application/json'},
+    body: json.encode({
+      'id':id,
+      'emp_code': code,
+      'emp_name': name,
+      'emp_email': email,
+      'emp_salary': salary,
+      'emp_mobile': mobile,
+      'department_id': departmentId
+    }));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else if (response.statusCode >= 400) {
+      throw Exception('Failed to update employee');
+    } else {
+        throw Exception('Something went wrong! Please try again later.');
+    } 
   }
 }

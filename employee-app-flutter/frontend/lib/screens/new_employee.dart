@@ -4,7 +4,9 @@ import 'package:frontend/models/employee.dart';
 import 'package:frontend/services/employee_service.dart';
 
 class NewEmployeeScreen extends StatefulWidget {
-  const NewEmployeeScreen({super.key});
+  const NewEmployeeScreen({super.key, this.employee});
+
+  final Employee? employee;
 
   @override
   State<NewEmployeeScreen> createState() {
@@ -14,14 +16,22 @@ class NewEmployeeScreen extends StatefulWidget {
 
 class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   final _formKey = GlobalKey<FormState>();
-  var _enteredName = '';
-  var _enteredCode = '';
-  var _enteredEmail = '';
-  var _enteredMobile = '';
-  var _enteredSalary = 0;
+  // var _enteredName = '';
+  // var _enteredCode = '';
+  // var _enteredEmail = '';
+  // var _enteredMobile = '';
+  // var _enteredSalary = 0;
+  // var _isSending = false;
+  late String _enteredName ;
+  late String _enteredCode ;
+  late String _enteredEmail;
+  late String _enteredMobile;
+  late int _enteredSalary ;
+  late int _selectedDep ;
   var _isSending = false;
   String? _error;
   bool error = false;
+  bool _isEditing = false;
   List<Map<String, dynamic>> departments = [
     {
       'id': 1,
@@ -40,20 +50,42 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
       'name': 'BA',
     },
   ];
-  late int _selectedDep;
+  // late int _selectedDep;
   final EmployeeService _employeeService = EmployeeService();//emp service instance
+
+  void _showDialog() {
+    showDialog(
+      context: context, 
+      builder: (ctx)=> AlertDialog(
+        title: const Text('Success!'),
+        content: const Text('Employee Added.'),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.of(ctx).pop();//close dialog
+            }, 
+            child: const Text('OK')
+          )
+        ],
+      ));
+  }
 
   void _saveEmployee() async {
     if(_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
         _isSending = true;
+        error = false;
+        _error = null;
       });
       try {
-        // print('code: $_enteredCode');
-        // print('salary: $_enteredSalary');
-        final Map<String, dynamic> resData = await _employeeService.addEmployee(_enteredCode, _enteredName, _enteredEmail, _enteredSalary, _enteredMobile, _selectedDep);
-        // print(resData);
+        final Map<String, dynamic> resData = await _employeeService.addEmployee(
+          _enteredCode, 
+          _enteredName, 
+          _enteredEmail, 
+          _enteredSalary, 
+          _enteredMobile, 
+          _selectedDep);
         if (!context.mounted) {
           return;
         }
@@ -64,8 +96,16 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
           empEmail: _enteredEmail, 
           empSalary: _enteredSalary,
           departmentId: _selectedDep ));
+        
+        _showDialog();
+        setState(() {
+          _isSending = false;
+        });
+        
       } catch(err) {
-        _isSending = false;
+        setState(() {
+          _isSending = false;
+        });
         error = true;
         setState(() {
           _error = err.toString().split(": ")[1];
@@ -82,7 +122,16 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedDep = departments[0]['id'];
+    // _selectedDep = departments[0]['id'];
+    if(widget.employee != null) {
+      _isEditing = true;
+      _enteredCode = widget.employee!.empCode;
+      _enteredName = widget.employee!.empName;
+      _enteredEmail = widget.employee!.empEmail;
+      _enteredMobile = widget.employee!.empMobile ?? '';
+      _enteredSalary = widget.employee!.empSalary;
+      _selectedDep = widget.employee!.departmentId;
+    }
   }
 
   @override
@@ -92,7 +141,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add a new Employee'),
+        title: Text(_isEditing ? 'Edit Employee' : 'Add a new Employee'),
         // backgroundColor: Theme.of(context).colorScheme.surface,
       ),
 
@@ -104,7 +153,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
             ),
             child: IntrinsicHeight(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(20,20,20,keyboardSpace+20),
+                padding: EdgeInsets.fromLTRB(30,20,30,keyboardSpace+20),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -112,6 +161,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                       TextFormField(
                         maxLength: 50,
                         decoration: const InputDecoration(label: Text('Name')),
+                        initialValue: _enteredName,
                         validator: (value) {
                           //can return error if validation fails
                           if (value == null ||
@@ -132,6 +182,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                       TextFormField(
                         maxLength: 10,
                         decoration: const InputDecoration(label: Text('Code')),
+                        initialValue: _enteredCode,
                         validator: (value) {
                           //can return error if validation fails
                           if (value == null ||
@@ -151,6 +202,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                       ),
                       TextFormField(
                         decoration: const InputDecoration(label: Text('Email')),
+                        initialValue: _enteredEmail,
                         validator: (value) {
                           //can return error if validation fails
                           final emailRegex = RegExp(
@@ -173,8 +225,8 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                       ),
                       TextFormField(
                         maxLength: 10,
-                        decoration:
-                            const InputDecoration(label: Text('Mobile')),
+                        decoration: const InputDecoration(label: Text('Mobile')),
+                        initialValue: _enteredMobile,
                         validator: (value) {
                           //can return error if validation fails
                           if (value == null ||
@@ -196,6 +248,7 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                         maxLength: 10,
                         decoration:
                             const InputDecoration(label: Text('Salary')),
+                        initialValue: _enteredSalary.toString(),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           //can return error if validation fails
@@ -240,7 +293,8 @@ class _NewEmployeeScreenState extends State<NewEmployeeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          error ? Text(_error!) : Container(),
+                          // error ? Text(_error!) : Container(),
+                          if (error) Flexible(child: Text(_error!)),
                           const SizedBox(width: 10,),
                           TextButton(
                               onPressed: _isSending

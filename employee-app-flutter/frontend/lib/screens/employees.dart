@@ -82,12 +82,18 @@ void _addEmployeeLocally() async {
   });
 }
 //////////////////////////////////////////////////////////////////
+void _editEmployee(employee) async {
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (context) => NewEmployeeScreen(employee: employee,)));
+}
+//////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
     Widget content = EmployeeTable(
       employees: _employees,
       onRemove: _removeEmployee,
+      onEdit: _editEmployee,
     );
 
     if (_isLoading) {

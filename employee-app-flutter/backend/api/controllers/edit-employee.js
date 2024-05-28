@@ -64,7 +64,6 @@ module.exports = {
       status: true,
       message: "Successfully Updated The Employee",
     });
-
   }
 
 
